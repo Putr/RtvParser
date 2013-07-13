@@ -8,12 +8,6 @@ Deploy
 ### Configure nginx
 Copy etc/nginx.conf.dist to etc/nginx.conf and configure it
 
-### Setup permissions
-(For ubuntu. You may have to install setfacl)
-
-    sudo setfacl -R -m u:www-data:rwX -m u:`whoami`:rwX app/cache app/logs
-    sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx app/cache app/logs
-
 ### Configure application
 
 Copy app/conf/paramaters.yml.dist to app/conf/paramaters.yml and configure correctly
@@ -30,13 +24,19 @@ Install dependencies
 
     php composer.phar install
 
+### Setup permissions
+(For ubuntu. You may have to install setfacl)
+
+    sudo setfacl -R -m u:www-data:rwX -m u:`whoami`:rwX app/cache app/logs
+    sudo setfacl -dR -m u:www-data:rwx -m u:`whoami`:rwx app/cache app/logs
+
 ### [PROD ONLY] Dump assests
 
     php app/console assetic:dump --env=prod --no-debug
 
 Setup database:
 
-	sudo chown USER:www-data app/data -r
+	sudo chown USER:www-data app/data -R
 	sudo chmod 775 app/data
     php app/console doctrine:database:create
     php app/console doctrine:schema:update --force
