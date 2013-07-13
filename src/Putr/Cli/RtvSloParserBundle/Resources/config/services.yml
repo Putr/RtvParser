@@ -1,0 +1,22 @@
+parameters:
+#
+
+services:
+
+    dnevnik.rtv:
+      class: Putr\Cli\RtvSloParserBundle\Service\RTV
+      arguments: [@logger, @service_container]
+      tags:
+            - { name: monolog.logger, channel: videoRTVService }
+
+    dnevnik.twitter:
+      class: Putr\Cli\RtvSloParserBundle\Service\Twitter
+      arguments: [@logger, @service_container]
+      tags:
+            - { name: monolog.logger, channel: twitterService }
+
+    dnevnik.rss:
+      class: Putr\Cli\RtvSloParserBundle\Service\RSS
+      arguments: [@logger, @service_container]
+      tags:
+            - { name: monolog.logger, channel: rssService }

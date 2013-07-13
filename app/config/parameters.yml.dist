@@ -1,0 +1,22 @@
+parameters:
+    database_driver: pdo_sqlite
+    database_user: root
+    database_password: root
+    database_path: %kernel.root_dir%/data/primary.db3
+    doctrine.connections: []
+
+    mailer_transport:  smtp
+    mailer_host:       127.0.0.1
+    mailer_user:       ~
+    mailer_password:   ~
+
+    locale:            en
+    secret:            ThisTokenIsNotSoSecretChangeIt
+
+    twitter.OAuthToken:
+    twitter.OAuthSecret:
+    twitter.host: https://api.twitter.com/1.1/
+
+    twitter.dnevnik.consumerKey: 
+    twitter.dnevnik.consumerSecret:
+
