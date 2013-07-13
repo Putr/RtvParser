@@ -21,6 +21,7 @@ Copy app/conf/paramaters.yml.dist to app/conf/paramaters.yml and configure corre
 ### Run composer
 
 Install composer
+
     curl -s http://getcomposer.org/installer | php
 
 NOTE: You can install composer globaly on your system
@@ -42,4 +43,5 @@ Setup database:
 
 ### Start using it!
 To get list of commands run:
+
     php app/console
