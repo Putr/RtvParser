@@ -38,7 +38,8 @@ class RSS {
 
         $articles = $this->container->get('doctrine')->getManager()->getRepository('PutrCliRtvSloParserBundle:Dnevnik')->findBy(
         	array("source" => $source),
-        	array("date" => "DESC")
+        	array("date" => "DESC"),
+        	14 // Limit
         	);
 
         switch ($source) {
