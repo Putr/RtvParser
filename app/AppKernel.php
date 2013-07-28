@@ -14,12 +14,15 @@ class AppKernel extends Kernel
             new Symfony\Bundle\MonologBundle\MonologBundle(),
             new Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle(),
             new Symfony\Bundle\AsseticBundle\AsseticBundle(),
-            new Sonata\CacheBundle\SonataCacheBundle(),
+            //new Sonata\CacheBundle\SonataCacheBundle(),
             new Doctrine\Bundle\DoctrineBundle\DoctrineBundle(),
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             //new Fkr\SimplePieBundle\FkrSimplePieBundle(),
             new Putr\Cli\RtvSloParserBundle\PutrCliRtvSloParserBundle(),
             new Eko\FeedBundle\EkoFeedBundle(),
+            new Putr\PushoverBundle\PutrPushoverBundle(),
+            new Snc\RedisBundle\SncRedisBundle(),
+            new OldSound\RabbitMqBundle\OldSoundRabbitMqBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {

@@ -42,15 +42,15 @@ assetic:
 doctrine:
     dbal:
         driver:   %database_driver%
-        #host:     %database_host%
-        #port:     %database_port%
-        #dbname:   %database_name%
+        host:     %database_host%
+        port:     %database_port%
+        dbname:   %database_name%
         user:     %database_user%
         password: %database_password%
         charset:  UTF8
         # if using pdo_sqlite as your database driver, add the path in parameters.yml
         # e.g. database_path: %kernel.root_dir%/data/data.db3
-        path:     %database_path%
+        #path:     %database_path%
 
     orm:
         auto_generate_proxy_classes: %kernel.debug%
@@ -72,9 +72,27 @@ eko_feed:
             link:        'https://twitter.com/DnevnikBot'
             encoding:    'utf-8'
             author:      'RTVSlo & DnevnikBot' # Only required for Atom feeds
-sonata_cache:
-    caches:
-        memcached:
-            prefix: dnevnik_feeds     # prefix to ensure there is no clash between instances
-            servers:
-                - {host: 127.0.0.1, port: 11211, weight: 0}
+
+snc_redis:
+    clients:
+        default:
+            type: predis
+            alias: default
+            dsn: redis://localhost
+
+old_sound_rabbit_mq:
+    connections:
+        default:
+            host:      'localhost'
+            port:      5672
+            user:      'guest'
+            password:  'guest'
+            vhost:     '/'
+          #  lazy:      false
+    rpc_clients:
+        scraper_scheduler: # old_sound_rabbit_mq.integer_store_rpc
+            connection: default
+    rpc_servers:
+        scraper_worker:
+            connection: default
+            callback: scraper_worker

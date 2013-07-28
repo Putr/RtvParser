@@ -3,12 +3,13 @@
 namespace Putr\Cli\RtvSloParserBundle\Service;
 
 use Symfony\Component\DomCrawler\Crawler;
+use Putr\Cli\RtvSloParserBundle\Entity\Program;
 
 class RTV extends VideoInfo {
 
 	public $rootUrl = "http://ava.rtvslo.si";
 
-	const SOURCE = "rtv";
+	protected $programRepo;
 
 	/**
 	 * Constructor
@@ -21,57 +22,49 @@ class RTV extends VideoInfo {
 	}
 
 	/**
-	 * Get dnevniks for today
-	 * 
-	 * @param  boolean|\DateTime $today 
-	 *         Used to force retrival of older days
-	 * @return array
-	 *         New entries
-	 */
-	public function getTodaysDnevnik($today = false) {
-		$this->logger->debug("Retriving todays RTV dnevniks");
-
-		$to = $from = new \DateTime();
-
-		if ($today !== false) {
-			$to = $from = $today;
-		}
-
-		$data = $this->getDnevnik($to, $from);
-
-		return $data["changed"];
-	}
-
-	/**
 	 * Retrives data from RTV for a given date span
-	 * @param  \DateTime        $to
-	 * @param  \DateTime|string $from
+	 * @param  array            $task
+	 * 
 	 * @return array
 	 */
-	public function getDnevnik(\DateTime $to, $from = "") {
+	public function getVideos($task) {
+
+		$to = new \DateTime($task["to"]);
+		$from = new \DateTime($task["from"]);
 
 		$to = $to->format('d.m.Y');
 
-		if ($from !== "") {
+		if ($from) {
 			$from = $from->format('d.m.Y');
 		}
 
-		$this->logger->debug(sprintf("Retriving dnevniks between %s and %s", $to, $from));
+		$program = $this->getProgramRepo()->findOneById($task["programId"]);
 
-		$url = sprintf("http://ava.rtvslo.si/?c_mod=play&op=search&func=search&form_type=advanced&search_text=&search_media=tv&search_type=34&search_extid=92&search_orderby=date&search_order=desc&search_dateframe=1w&search_datefrom=%s&search_dateto=%s&page=0",
-				$from,
-				$to
-				);
+		$this->logger->debug(sprintf("Retriving videos between %s and %s for %s", $to, $from, $program->getTitle()));
+	
+		$url = str_replace(array("{to}", "{from}"), array($to, $from), $task["url"]);
 
 		$data = $this->getAjaxList($url);
 
-		$changed = $this->updateData(self::SOURCE, $data);
+		if ($data === false) {
+			return false;
+		}
+
+		$changed = $this->updateData($data, $program);
 
 		return array(
 			"all" => $data,
 			"changed" => $changed
 			);
 
+	}
+
+	protected function getProgramRepo() {
+		if (empty($this->programRepo)) {
+			$this->em           = $this->container->get('doctrine')->getManager();
+			$this->programRepo  = $this->em->getRepository('Putr\Cli\RtvSloParserBundle\Entity\Program');
+		}
+		return $this->programRepo;
 	}
 
 	protected function getAjaxList($url) {
@@ -82,7 +75,7 @@ class RTV extends VideoInfo {
 
 		if (!is_string($html)) {
 			$this->logger->warn("RTV did not return a string");
-			exit;
+			return false;
 		}
 
 		$crawler = new Crawler($html);

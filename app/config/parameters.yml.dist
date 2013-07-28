@@ -1,9 +1,12 @@
 parameters:
-    database_driver: pdo_sqlite
-    database_user: root
-    database_password: root
-    database_path: %kernel.root_dir%/data/primary.db3
-    doctrine.connections: []
+    database_driver:   pdo_mysql
+    database_host:     localhost
+    database_port:     ~
+    database_name:     personal_rtv
+    database_user:     root
+    database_password: ~
+
+
 
     mailer_transport:  smtp
     mailer_host:       127.0.0.1
@@ -20,3 +23,4 @@ parameters:
     twitter.dnevnik.consumerKey: 
     twitter.dnevnik.consumerSecret:
 
+    pushover.app.token: 

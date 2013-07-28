@@ -3,13 +3,13 @@ parameters:
 
 services:
 
-    dnevnik.rtv:
+    rtv.scraper:
       class: Putr\Cli\RtvSloParserBundle\Service\RTV
       arguments: [@logger, @service_container]
       tags:
             - { name: monolog.logger, channel: videoRTVService }
 
-    dnevnik.twitter:
+    rtv.twitter.dnevnik:
       class: Putr\Cli\RtvSloParserBundle\Service\Twitter
       arguments: [@logger, @service_container]
       tags:
@@ -20,3 +20,9 @@ services:
       arguments: [@logger, @service_container]
       tags:
             - { name: monolog.logger, channel: rssService }
+
+    scraper_worker:
+      class: Putr\Cli\RtvSloParserBundle\Consumer\ScraperWorkerConsumer
+      arguments: [@logger, @service_container]
+      tags:
+            - { name: monolog.logger, channel: scraperWorker }

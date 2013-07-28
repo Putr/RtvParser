@@ -38,8 +38,11 @@ Setup database:
 
 	sudo chown USER:www-data app/data -R
 	sudo chmod 775 app/data
-    php app/console doctrine:database:create
     php app/console doctrine:schema:update --force
+
+### Install redis
+
+### Install rabbitMQ
 
 ### Start using it!
 To get list of commands run:

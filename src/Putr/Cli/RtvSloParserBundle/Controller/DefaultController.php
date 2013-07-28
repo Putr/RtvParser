@@ -14,7 +14,9 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
-       
+       $msg = array('url' => "nek url");
+    $this->container->get('old_sound_rabbit_mq.scraper_scheduler_producer')->publish(serialize($msg));
+    var_dump("Sent message"); die();
         return array();
     }
 

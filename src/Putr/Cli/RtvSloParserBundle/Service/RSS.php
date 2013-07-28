@@ -18,21 +18,25 @@ class RSS {
 
 	/**
 	 * Retrive Feed data
+	 *
+	 * @todo  CACHING with redis
+	 * 
 	 * @param  string  $source
 	 * @param  boolean $cacheRebuild 
+	 * 
 	 * @return string
 	 */
 	public function getFeed($source, $cacheRebuild = false){
 		$this->logger->debug("Retriving feed", array("source" => $source));
 
-		$cache = $this->container->get('sonata.cache.memcached');
+		// $cache = $this->container->get('sonata.cache.memcached');
 
         $key = 'dnevnik.rss.' . $source;
 
-        if (!$cacheRebuild && $cache->has(array($key))) {
-			$data = $cache->get(array($key));
-			return $data->getData();
-		}
+  //       if (!$cacheRebuild && $cache->has(array($key))) {
+		// 	$data = $cache->get(array($key));
+		// 	return $data->getData();
+		// }
 
 		$this->logger->info("Rebuilding cache while getting feed.", array("source" => $source));
 
@@ -53,7 +57,7 @@ class RSS {
         $feed->addFromArray($articles);
 
         $render = $feed->render('rss'); // or 'atom'
-        $cache->set(array($key), $render, $ttl = "3600");
+        // $cache->set(array($key), $render, $ttl = "3600");
 
         return $render;
 	}

@@ -2,7 +2,7 @@
 
 namespace Putr\Cli\RtvSloParserBundle\Service;
 
-use Putr\Cli\RtvSloParserBundle\Entity\Dnevnik;
+use Putr\Cli\RtvSloParserBundle\Entity\Video;
 
 class VideoInfo {
 
@@ -20,42 +20,46 @@ class VideoInfo {
 	}
 
 	/**
-	 * Updates dnevnik data in db
+	 * Updates video data in db
 	 * 
 	 * @param  string $source 
 	 * @param  array  $data   
 	 * @return array
 	 */
-	protected function updateData($source, $data) {
+	protected function updateData($data, $program) {
 
-		$this->logger->debug("Updating dnevnik data for ". $source);
+		$this->logger->debug("Updating video data");
 
 		if (empty($data)) {
 			$this->logger->debug("Data is empty - nothing to update");
 			return;
 		}
 
-		if (empty($source)) {
-			throw new \InvalidArgumentException("Source is not defined");
-		}
-
-		$repo = $this->getDnevnikRepo();
+		$repo = $this->getVideoRepo();
 
 		$new  = array();
 		foreach ($data as $entry) {
 
-			$prev = $repo->findByUrl($entry["link"]);
+			if (empty($entry["title"])) {
+				$entry["title"] = $program->getTitle() . " " . $entry["date"];
+			}
+
+			if (empty($entry["program"])) {
+				$entry["program"] = $program;
+			}
+
+			$prev = $repo->findByLink($entry["link"]);
 
 			if (empty($prev)) {
-				$this->addNewDnevnik($entry, $source);
+				$this->addNewVideo($entry);
 				$new[] = $entry;
 			}
 		}
 
-		if (count($new) > 0) {
-			$rss = $this->container->get('dnevnik.rss');
-			$rss->getFeed('rtv', true);
-		}
+		// if (count($new) > 0) {
+		// 	$rss = $this->container->get('video.rss');
+		// 	$rss->getFeed('rtv', true);
+		// }
 
 		$this->logger->info(sprintf("Found %s new entries.", count($new)));
 
@@ -68,17 +72,27 @@ class VideoInfo {
 	 * @param array $data
 	 * @param string
 	 */
-	protected function addNewDnevnik($data, $source) {
+	protected function addNewVideo($data) {
 
-		$this->logger->debug(sprintf("Adding new entry for date %s and source %s", $data["date"], $source));
+		$this->logger->debug(sprintf("Adding new entry for date %s and program %s", $data["date"], $data["program"]->getTitle()));
 
-		$repo = $this->getDnevnikRepo();
+		$repo = $this->getVideoRepo();
 
-		$dn = new Dnevnik();
-		$dn->setSource($source);
-		$dn->setDate(new \DateTime($data["date"]));
-		$dn->setUrl($data["link"]);
-		$dn->setAddedDate(new \DateTime());
+		if (
+			!isset($data["program"]) &&
+			!isset($data["title"]) &&
+			!isset($data["date"]) &&
+			!isset($data["link"])
+			) {
+			throw new \InvalidArgumentException(sprintf("Missing parameters! %s", var_export($data, true)));
+		}
+
+		$dn = new Video();
+		$dn->setProgram($data["program"]);
+		$dn->setTitle($data["title"]);
+		$dn->setDatePublished(new \DateTime($data["date"]));
+		$dn->setLink($data["link"]);
+		$dn->setDateAdded(new \DateTime());
 
 		$this->em->persist($dn);
 		$this->em->flush();
@@ -90,10 +104,10 @@ class VideoInfo {
 	 * Returns Doctrine repo and sets doctrine entity maneger
 	 * 
 	 */
-	protected function getDnevnikRepo() {
+	protected function getVideoRepo() {
 		if (empty($this->repo)) {
 			$this->em    = $this->container->get('doctrine')->getManager();
-			$this->repo  = $this->em->getRepository('Putr\Cli\RtvSloParserBundle\Entity\Dnevnik');
+			$this->repo  = $this->em->getRepository('Putr\Cli\RtvSloParserBundle\Entity\Video');
 		}
 		return $this->repo;
 	}
